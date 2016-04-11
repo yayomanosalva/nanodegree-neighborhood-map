@@ -10,7 +10,7 @@ var modernizr = require('gulp-modernizr');
 
 gulp.task('content', function(){
   gulp.src('./src/index.html')
-      .pipe(gulp.dest('./dist/'))
+      .pipe(gulp.dest('./src/'))
       .pipe(reload({stream: true}))
 });
 
@@ -20,14 +20,14 @@ gulp.task('script', function(){
       .pipe(uglify())
       .pipe(concat('app.js'))
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./dist/scripts'))
+    .pipe(gulp.dest('./src/scripts'))
     .pipe(reload({stream: true}))
 });
 
 gulp.task('styles', function(){
   return gulp.src('./src/styles/*.js')
     .pipe(uglify())
-      .pipe(gulp.dest('./dist/styles'))
+      .pipe(gulp.dest('./src/styles'))
 });
 
 gulp.task('modernizr', function() {
