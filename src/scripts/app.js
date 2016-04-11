@@ -2,12 +2,12 @@
 /* ========= class for the map =========*/
 var mapa = function() {
     /* ========= Variable declare =========*/
-    var myLatLng = {
+    this.myLatLng = {
         lat: 11.00414,
         lng: -74.8132908
     };
 
-    var myOptions = {
+    this.myOptions = {
         center: myLatLng,
         panControl: false,
         disableDefaultUI: true,
@@ -81,7 +81,7 @@ function setMarkers(map) {
 
 }
 
-/*
+
 var viewModel = function() {
 
     this.marker = ko.observable();
@@ -153,4 +153,3 @@ var viewModel = function() {
 }
 
 ko.applyBindings(viewModel);
-*/

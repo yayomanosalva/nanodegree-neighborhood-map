@@ -56,3 +56,23 @@ html, body {
 strong {
   margin-right: 1rem;
 }
+
+input[type="search"] {
+    padding: 13px 10px;
+    line-height: 20px;
+    width: 100%;
+    padding: 13px 10px;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    border-radius: 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    outline: none;
+    background: #fff;
+    color: #000;
+    border: 1px solid #E6E7E9;
+    font-weight: 200;
+    min-height: 50px;
+}
