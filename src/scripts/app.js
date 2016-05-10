@@ -2,154 +2,91 @@
 /* ========= class for the map =========*/
 var mapa = function() {
     /* ========= Variable declare =========*/
-    this.myLatLng = {
-        lat: 11.00414,
-        lng: -74.8132908
-    };
-
     this.myOptions = {
-        center: myLatLng,
+        center: new google.maps.LatLng(11.00414, -74.8132908),
         panControl: false,
         disableDefaultUI: true,
-        zoom: 16,
-        mapTypeId: 'terrain'
+        zoom: 17,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
-    this.map = new google.maps.Map($('#map')[0], myOptions);
-    setMarkers(map);    
+    this.map = new google.maps.Map($('#map')[0], this.myOptions);
 }
 
+// Here's my data model
+var ViewModel = function() {
+    var self = this;
+    self.name = ko.observable('');
+    self.mapa = new mapa();
+
+    function location( ) {
+      this.name = ko.observable(name);
+      this.type = ko.observable(type);      
+      this.restaurantIcon = 'images/restaurants.png';
+      this.storesIcon = 'images/stores.png';
+      // This marker is 20 pixels wide by 32 pixels high.
+      this.size = new google.maps.Size(35, 52);
+       // The origin for this image is (0, 0).
+      this.origin = new google.maps.Point(0, 0);
+      this.anchor = new google.maps.Point(0, 32);
+      /* lat and long are observables for future use with drag events */
+      this.lat = ko.observable(lat);
+      this.long = ko.observable(long);
+      this.category = category;
+      /* the map marker for this point */
+      this.marker = new google.maps.Marker({
+        position: new google.maps.LatLng(lat, long),
+        title: name,
+        map: self.mapa.map,
+        draggable: draggable
+      });
+      console.log('observableArray');
+    }
+    
+
+    this.shape = {
+      coords: [1, 1, 1, 20, 18, 20, 18, 1],
+      type: 'poly'
+    };
+
+    self.location = ko.observableArray([
+        new self.location('Mc donald', 11.004012, -74.812481, false, 'restaurant'),
+        new self.location('Hamburguesas El Corral', 11.004836, -74.812189, false, 'restaurant'),
+        new self.location('Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'restaurant'),
+        new self.location('LUPI', 11.005128, -74.811161, false, 'store')        
+    ]);
+
+    for (var i = 0; i < location.length; i++) {
+      location.restaurantIcon();  
+    }
+
+    /*self.location.push(new ViewModel('Mc donald', 11.004012, -74.812481, false, 'restaurant'));
+    self.location.push(new ViewModel('Hamburguesas El Corral', 11.004836, -74.812189, false, 'restaurant'));
+    self.location.push(new ViewModel('Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'restaurant'));
+    self.location.push(new ViewModel('LUPI', 11.005128, -74.811161, false, 'restaurant'));
+*/
+};
+ko.applyBindings(new ViewModel());
+
 // Data for the markers consisting of a name, a LatLng and a zIndex for the
-// order in which these markers should display on top of each other.
 
-var restaurants = [
-  ['Mc donald', 11.004012, -74.812481, false, 'food hamburger', 4],
-  ['Hamburguesas El Corral', 11.004836, -74.812189, false, 'food hamburger', 5],
-  ['Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'food restaurant', 3],
-  ['LUPI', 11.005128, -74.811161, false, 'food restaurant', 1]
-];
-
-
-
+/*
 function setMarkers(map) {
   // Adds markers to the map.
+  var restaurants = [
+    ['Mc donald', 11.004012, -74.812481, false, 'restaurant', 4],
+    [ 'Hamburguesas El Corral', 11.004836, -74.812189, false, 'restaurant', 5],
+    ['Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'restaurant', 3],
+    ['LUPI', 11.005128, -74.811161, false, 'restaurant', 2]
+  ];
 
-  // Marker sizes are expressed as a Size of X,Y where the origin of the image
-  // (0,0) is located in the top left of the image.
-
-  // Origins, anchor positions and coordinates of the marker increase in the X
-  // direction to the right and in the Y direction down.
-  var image = {
+  var img = {
     url: 'images/restaurants.png',
     // This marker is 20 pixels wide by 32 pixels high.
     size: new google.maps.Size(35, 52),
     // The origin for this image is (0, 0).
     origin: new google.maps.Point(0, 0),
     // The anchor for this image is the base of the flagpole at (0, 32).
-    anchor: new google.maps.Point(0, 52)
-  };
-
-  var stores = {
-    url: 'images/stores.png',
-    // This marker is 20 pixels wide by 32 pixels high.
-    size: new google.maps.Size(3, 32),
-    // The origin for this image is (0, 0).
-    origin: new google.maps.Point(0, 0),
-    // The anchor for this image is the base of the flagpole at (0, 32).
     anchor: new google.maps.Point(0, 32)
   };
-  // Shapes define the clickable region of the icon. The type defines an HTML
-  // <area> element 'poly' which traces out a polygon as a series of X,Y points.
-  // The final coordinate closes the poly by connecting to the first coordinate.
-  var shape = {
-    coords: [1, 1, 1, 20, 18, 20, 18, 1],
-    type: 'poly'
-  };
-
-  for (var i = 0; i < restaurants.length; i++) {
-    var restaurant = restaurants[i];
-    var marker = new google.maps.Marker({
-      position: {lat: restaurant[1], lng: restaurant[2]},
-      map: map,
-      icon: image,
-      shape: shape,
-      title: restaurant[0],
-      zIndex: restaurant[3]
-    });
-  }
-
-
-}
-
-
-var viewModel = function() {
-
-    this.marker = ko.observable();
-    this.myLatLng = ko.observable()
-
-    this.Mapa = new mapa();
-
-    this.restaurants = ko.observableArray([
-        new this.restaurants('Mc donald', 11.004012, -74.812481, false, 'food hamburger'),
-        new this.restaurants('Hamburguesas El Corral', 11.004836, -74.812189, false, 'food hamburger'),
-        new this.restaurants('Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'food restaurant'),
-        new this.restaurants('LUPI', 11.005128, -74.811161, false, 'food restaurant'),        
-    ]);
-
-    this.listPoint = ko.observable(1);
-
-    this.watchList = ko.computed(function(){
-        return this.restaurants().slice();
-    });
-
-    function setMarkers(map) {
-      // Adds markers to the map.
-
-      // Marker sizes are expressed as a Size of X,Y where the origin of the image
-      // (0,0) is located in the top left of the image.
-
-      // Origins, anchor positions and coordinates of the marker increase in the X
-      // direction to the right and in the Y direction down.
-      var image = {
-        url: 'images/restaurants.png',
-        // This marker is 20 pixels wide by 32 pixels high.
-        size: new google.maps.Size(35, 52),
-        // The origin for this image is (0, 0).
-        origin: new google.maps.Point(0, 0),
-        // The anchor for this image is the base of the flagpole at (0, 32).
-        anchor: new google.maps.Point(0, 52)
-      };
-      var stores = {
-        url: 'images/stores.png',
-        // This marker is 20 pixels wide by 32 pixels high.
-        size: new google.maps.Size(3, 32),
-        // The origin for this image is (0, 0).
-        origin: new google.maps.Point(0, 0),
-        // The anchor for this image is the base of the flagpole at (0, 32).
-        anchor: new google.maps.Point(0, 32)
-      };
-      // Shapes define the clickable region of the icon. The type defines an HTML
-      // <area> element 'poly' which traces out a polygon as a series of X,Y points.
-      // The final coordinate closes the poly by connecting to the first coordinate.
-      var shape = {
-        coords: [1, 1, 1, 20, 18, 20, 18, 1],
-        type: 'poly'
-      };
-      for (var i = 0; i < restaurants.length; i++) {
-        var restaurant = restaurants[i];
-        var marker = new google.maps.Marker({
-          position: {lat: restaurant[1], lng: restaurant[2]},
-          map: map,
-          icon: image,
-          shape: shape,
-          title: restaurant[0],
-          zIndex: restaurant[3]
-        });
-      }
-
-
-    }
-  
-}
-
-ko.applyBindings(viewModel);
+}*/
