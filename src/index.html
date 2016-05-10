@@ -10,19 +10,29 @@
   <!-- JS links -->
   <script src="scripts/jquery-2.2.2.min.js"></script>
   <script src="scripts/knockout-3.4.0.js"></script>
-  <script src="scripts/app.js"></script>
   <script src="scripts/modernizr-custom.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAduDRTpulVLoOk794sbmvqFJs_YMKvXQ0&callback=mapa"></script>
+  <script src="scripts/app.js"></script>
 </head>
 <body>
-  <div id="map"></div>
-  <div id="tool">
-    <h3>Stores and Restaurants</h3>
-    <input type="search" placeholder="find stores and restaurants" data-bind=" ">
-    <ul id="pointList" data-bind="visible: listVisible,
-        template: {name: 'pointsTemplate',foreach: watchList}">
-    </ul>                          
-  </div>
-  
+    <div id="map"></div>
+    <div id="tool">
+        <!--this is the points list-->
+        <h3>Stores and Restaurants</h3>
+        <p data-bind='fadeVisible: displayAdvancedOptions'>
+            Show:
+            <label><input type='radio' name="type" value='all' data-bind='checked: typeToShow' />All</label>
+            <label><input type='radio' name="type" value='store' data-bind='checked: typeToShow' />Stores</label>
+            <label><input type='radio' name="type" value='restaurant' data-bind='checked: typeToShow' />Restaurants</label>
+        </p>
+        <ul id="pointList" data-bind="visible: listVisible, template: {name: 'pointsTemplate',foreach: shownList}"></ul>                          
+    </div>
+    <!--this is a knockout template used for point list items-->
+    <script type="text/html" id="pointsTemplate">
+        <li data-bind="event: {mouseover: $parent.mouseHere, mouseleave: $parent.mouseGone}, click:$parent.selectPoint, css: $parent.getStyle($data)">
+            <strong data-bind="text: name"></strong> –
+            <span data-bind="text: '(' + category + ')'"></span>
+        </li>
+    </script>
 </body>
 </html>
