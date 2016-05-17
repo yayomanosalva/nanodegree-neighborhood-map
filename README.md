@@ -10,11 +10,10 @@ You can download the project in this repositpry
 1. import libreries 
 
   ```bash
-  <script src="scripts/jquery-2.2.2.min.js"></script>
   <script src="scripts/knockout-3.4.0.js"></script>
-  <script src="scripts/app.js"></script>
   <script src="scripts/modernizr-custom.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAduDRTpulVLoOk794sbmvqFJs_YMKvXQ0&callback=mapa"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script src="scripts/app.js"></script>
   ```
 
 1. author
