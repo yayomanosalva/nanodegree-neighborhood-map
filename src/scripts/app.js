@@ -1,95 +1,107 @@
 // Google Maps JavaScript API
-/* ========= class for the map =========*/
-var mapa = function() {
-    /* ========= Variable declare =========*/
-    this.myOptions = {
-        center: new google.maps.LatLng(11.00414, -74.8132908),
-        panControl: false,
-        disableDefaultUI: true,
-        zoom: 17,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
+var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 17,
+    center: new google.maps.LatLng(11.00414, -74.8132908),
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    panControl: false,
+    disableDefaultUI: true
+});
 
-    this.map = new google.maps.Map($('#map')[0], this.myOptions);
-}
-
-// Here's my data model
-var ViewModel = function() {
+/* ========= Marker  =========*/
+var Marker = function (name, lat, long, category) {
     var self = this;
-    self.name = ko.observable('');
-    self.mapa = new mapa();
+    self.name = ko.observable();
+    self.lat = ko.observable(lat);
+    self.long = ko.observable(long);
+    /* ========= Images Icons  =========*/
+    // Setup the different icons
 
-    function location( ) {
-      this.name = ko.observable(name);
-      this.type = ko.observable(type);      
-      this.restaurantIcon = 'images/restaurants.png';
-      this.storesIcon = 'images/stores.png';
-      // This marker is 20 pixels wide by 32 pixels high.
-      this.size = new google.maps.Size(35, 52);
-       // The origin for this image is (0, 0).
-      this.origin = new google.maps.Point(0, 0);
-      this.anchor = new google.maps.Point(0, 32);
-      /* lat and long are observables for future use with drag events */
-      this.lat = ko.observable(lat);
-      this.long = ko.observable(long);
-      this.category = category;
-      /* the map marker for this point */
-      this.marker = new google.maps.Marker({
+    var img = {
+        url: 'images/restaurants.png',
+        // This marker is 20 pixels wide by 32 pixels high.
+        size: new google.maps.Size(35, 52),
+        // The origin for this image is (0, 0).
+        origin: new google.maps.Point(0, 0),
+        // The anchor for this image is the base of the flagpole at (0, 32).
+        anchor: new google.maps.Point(0, 32)
+    };
+    var img2 = {
+        url: 'images/store.png'
+    }
+
+    var marker = new google.maps.Marker({
         position: new google.maps.LatLng(lat, long),
         title: name,
-        map: self.mapa.map,
-        draggable: draggable
-      });
-      console.log('observableArray');
-    }
-    
+        map: map,
+        icon: img
+    });
 
-    this.shape = {
-      coords: [1, 1, 1, 20, 18, 20, 18, 1],
-      type: 'poly'
-    };
+    self.category = ko.observable();
+}
 
-    self.location = ko.observableArray([
-        new self.location('Mc donald', 11.004012, -74.812481, false, 'restaurant'),
-        new self.location('Hamburguesas El Corral', 11.004836, -74.812189, false, 'restaurant'),
-        new self.location('Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'restaurant'),
-        new self.location('LUPI', 11.005128, -74.811161, false, 'store')        
+var ViewModel = function () {
+    var self = this;
+    self.name = ko.observable('Store and Restaurant'); 
+
+    self.locations = ko.observableArray([
+      new Marker('Mc donald', 11.004012, -74.812481, 'restaurant'),
+      new Marker('Hamburguesas El Corral', 11.004836, -74.812189, 'restaurant'),
+      new Marker('Restaurante El Pulpo Paul', 11.003132, -74.810671, 'restaurant'),
+      new Marker('Restaurante LUPI', 11.005128, -74.811161, 'restaurant'),
+      new Marker('farma todo cll 82', 11.0030974, -74.81542189999999, 'store'),
+      new Marker('farma todo kr 51b', 11.004114,  -74.813444, false, 'store')
     ]);
 
-    for (var i = 0; i < location.length; i++) {
-      location.restaurantIcon();
+    this.planets = ko.observableArray([
+        { name: "Mercury", type: "rock"},
+        { name: "Venus", type: "rock"},
+        { name: "Earth", type: "rock"},
+        { name: "Mars", type: "rock"},
+        { name: "Jupiter", type: "gasgiant"},
+        { name: "Saturn", type: "gasgiant"},
+        { name: "Uranus", type: "gasgiant"},
+        { name: "Neptune", type: "gasgiant"}
+    ]);
+ 
+    this.typeToShow = ko.observable("all");
+    this.displayAdvancedOptions = ko.observable(false);
+ 
+    this.addPlanet = function(type) {
+        this.planets.push({
+            name: "New planet",
+            type: type
+        });
+    };
+ 
+    this.planetsToShow = ko.pureComputed(function() {
+        // Represents a filtered list of planets
+        // i.e., only those matching the "typeToShow" condition
+        var desiredType = this.typeToShow();
+        if (desiredType == "all") return this.planets();
+        return ko.utils.arrayFilter(this.planets(), function(planet) {
+            return planet.type == desiredType;
+        });
+    }, this);
+ 
+    // Animation callbacks for the planets list
+    this.showPlanetElement = function(elem) { if (elem.nodeType === 1) $(elem).hide().slideDown() }
+    this.hidePlanetElement = function(elem) { if (elem.nodeType === 1) $(elem).slideUp(function() { $(elem).remove(); }) }
+};
+ 
+// Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
+// Could be stored in a separate utility library
+ko.bindingHandlers.fadeVisible = {
+    init: function(element, valueAccessor) {
+        // Initially set the element to be instantly visible/hidden depending on the value
+        var value = valueAccessor();
+        $(element).toggle(ko.unwrap(value)); // Use "unwrapObservable" so we can handle values that may or may not be observable
+    },
+    update: function(element, valueAccessor) {
+        // Whenever the value subsequently changes, slowly fade the element in or out
+        var value = valueAccessor();
+        ko.unwrap(value) ? $(element).fadeIn() : $(element).fadeOut();
     }
 
-    /*self.location.push(new ViewModel('Mc donald', 11.004012, -74.812481, false, 'restaurant'));
-    self.location.push(new ViewModel('Hamburguesas El Corral', 11.004836, -74.812189, false, 'restaurant'));
-    self.location.push(new ViewModel('Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'restaurant'));
-    self.location.push(new ViewModel('LUPI', 11.005128, -74.811161, false, 'restaurant'));
-*/
 };
+
 ko.applyBindings(new ViewModel());
-
-// Data for the markers consisting of a name, a LatLng and a zIndex for the
-
-/*
-function setMarkers(map) {
-  // Adds markers to the map.
-  var restaurants = [
-    ['Mc donald', 11.004012, -74.812481, false, 'restaurant', 4],
-    [ 'Hamburguesas El Corral', 11.004836, -74.812189, false, 'restaurant', 5],
-    ['Restaurante El Pulpo Paul', 11.003132, -74.810671, false, 'restaurant', 3],
-    ['LUPI', 11.005128, -74.811161, false, 'restaurant', 2]
-  ];
-
-  var img = {
-    url: 'images/restaurants.png',
-    // This marker is 20 pixels wide by 32 pixels high.
-    size: new google.maps.Size(35, 52),
-    // The origin for this image is (0, 0).
-    origin: new google.maps.Point(0, 0),
-    // The anchor for this image is the base of the flagpole at (0, 32).
-    anchor: new google.maps.Point(0, 32)
-  };
-}*/
-
-
-
